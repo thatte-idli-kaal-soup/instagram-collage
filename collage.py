@@ -24,14 +24,14 @@ def get_images():
 
 def draw_text(width, height):
     # make a blank image for the text, initialized to transparent text color
-    txt = Image.new("RGBA", (width, height), (255, 255, 255, 0))
+    txt = Image.new("RGBA", (width, height), (0, 0, 0, 0))
 
     fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMonoBold.ttf", 2000)
 
     d = ImageDraw.Draw(txt)
-    d.text((width / 5, 10), "1", font=fnt, fill=(255, 255, 255, 255))
-    d.text((width / 5, height / 3), "0", font=fnt, fill=(255, 255, 255, 255))
-    d.text((width / 5, 2 * height / 3), "0", font=fnt, fill=(255, 255, 255, 255))
+    d.text((width / 5, 10), "1", font=fnt, fill=(0, 0, 0, 255))
+    d.text((width / 5, height / 3), "0", font=fnt, fill=(0, 0, 0, 255))
+    d.text((width / 5, 2 * height / 3), "0", font=fnt, fill=(0, 0, 0, 255))
     return txt
 
 
@@ -44,7 +44,7 @@ def create_collage(width, height, images):
     thumbnail_width = width // cols
     thumbnail_height = height // rows
     size = thumbnail_width, thumbnail_height
-    new_im = Image.new("RGBA", (width, height))
+    new_im = Image.new("RGB", (width, height))
     ims = []
     for p in images:
         im = Image.open(p)
@@ -62,6 +62,7 @@ def create_collage(width, height, images):
             y += thumbnail_height
         x += thumbnail_width
         y = 0
+    new_im = new_im.convert("RGBA")
     return new_im
 
 
