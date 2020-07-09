@@ -5,7 +5,7 @@ from math import sqrt
 import json
 
 
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 
 def get_images():
@@ -22,6 +22,19 @@ def get_images():
     return sorted(images, key=lambda x: ordered_images.index(x), reverse=True)
 
 
+def draw_text(width, height):
+    # make a blank image for the text, initialized to transparent text color
+    txt = Image.new("RGBA", (width, height), (255, 255, 255, 0))
+
+    fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMonoBold.ttf", 2000)
+
+    d = ImageDraw.Draw(txt)
+    d.text((width / 5, 10), "1", font=fnt, fill=(255, 255, 255, 255))
+    d.text((width / 5, height / 3), "0", font=fnt, fill=(255, 255, 255, 255))
+    d.text((width / 5, 2 * height / 3), "0", font=fnt, fill=(255, 255, 255, 255))
+    return txt
+
+
 def create_collage(width, height, images):
     # Adapted from https://stackoverflow.com/a/35460517
     n = len(images)
@@ -31,7 +44,7 @@ def create_collage(width, height, images):
     thumbnail_width = width // cols
     thumbnail_height = height // rows
     size = thumbnail_width, thumbnail_height
-    new_im = Image.new("RGB", (width, height))
+    new_im = Image.new("RGBA", (width, height))
     ims = []
     for p in images:
         im = Image.open(p)
@@ -42,7 +55,6 @@ def create_collage(width, height, images):
     y = 0
     for col in range(cols):
         for row in range(rows):
-            # print(i, x, y)
             if i >= n:
                 break
             new_im.paste(ims[i], (x, y))
@@ -50,9 +62,13 @@ def create_collage(width, height, images):
             y += thumbnail_height
         x += thumbnail_width
         y = 0
-    new_im.save("Collage.jpg")
+    return new_im
 
 
 if __name__ == "__main__":
     images = get_images()
-    create_collage(2880, 5120, images)
+    w, h = 2880, 5120
+    collage = create_collage(w, h, images)
+    text = draw_text(w, h)
+    out = Image.alpha_composite(collage, text)
+    out.save("collage.png")
