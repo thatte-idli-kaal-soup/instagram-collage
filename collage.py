@@ -131,7 +131,7 @@ def get_thumbnail(image, size):
     return image
 
 
-if __name__ == "__main__":
+def main():
     w, h = 2880, 5120
     images = get_images(CHRONO)
     print(len(images))
@@ -139,4 +139,8 @@ if __name__ == "__main__":
     text = draw_text(w, h)
     collage = pixelate(text, pixel_size)
     create_collage(collage, images, pixel_size)
-    collage.save("collage.png")
+    collage.save(f"collage.png")
+
+
+if __name__ == "__main__":
+    main()
