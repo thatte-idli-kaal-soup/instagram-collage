@@ -39,7 +39,7 @@ def create_collage(base_image, images, pixel_size):
     ims = []
     for p in images:
         im = Image.open(p)
-        im.thumbnail(size)
+        im = get_thumbnail(im, size)
         ims.append(im)
     i = 0
     for col in range(cols):
@@ -82,6 +82,24 @@ def get_thumbnail_size(images, width, height):
     thumbnail_height = height // rows
     assert thumbnail_height == thumbnail_width
     return thumbnail_width
+
+
+def get_thumbnail(image, size):
+    w, h = image.size
+    if abs(w - h) > 1:
+        left, right, upper, lower = 0, w, 0, h
+        crop = min(w, h)
+        if w > crop:
+            delta = int((w - crop) / 2)
+            left, right = delta, w - delta
+        else:
+            delta = int((h - crop) / 2)
+            upper, lower = delta, h - delta
+
+        image = image.crop((left, upper, right, lower))
+
+    image.thumbnail(size)
+    return image
 
 
 if __name__ == "__main__":
