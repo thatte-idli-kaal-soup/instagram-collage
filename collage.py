@@ -4,8 +4,8 @@ import glob
 from math import sqrt
 import json
 
-
-from PIL import Image, ImageDraw, ImageFont
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 
 def get_images():
@@ -24,50 +24,76 @@ def get_images():
 
 def draw_text(width, height):
     # make a blank image for the text, initialized to transparent text color
-    txt = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    txt = Image.new("RGBA", (width, height), (255, 255, 255, 0))
 
     fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMonoBold.ttf", 2000)
 
     d = ImageDraw.Draw(txt)
-    d.text((width / 5, 10), "1\n0\n0", font=fnt, fill=(0, 0, 0, 255))
+    d.text((width * 0.3, 10), "1\n0\n0", font=fnt, fill=(0, 0, 0, 255))
     return txt
 
 
-def create_collage(width, height, images):
+def create_collage(base_image, images, pixel_size):
     # Adapted from https://stackoverflow.com/a/35460517
-    n = len(images)
-    k = sqrt((width * height) / n)
-    cols = int(n / height * k) + 1
-    rows = int(n / width * k) + 1
-    thumbnail_width = width // cols
-    thumbnail_height = height // rows
-    size = thumbnail_width, thumbnail_height
-    new_im = Image.new("RGB", (width, height))
+    w, h = base_image.size
+    cols, rows = int(w / pixel_size), int(h / pixel_size)
+    print(cols, rows)
+    size = (pixel_size, pixel_size)
     ims = []
     for p in images:
         im = Image.open(p)
         im.thumbnail(size)
         ims.append(im)
     i = 0
-    x = 0
-    y = 0
     for col in range(cols):
         for row in range(rows):
-            if i >= n:
+            if i >= len(images):
                 break
-            new_im.paste(ims[i], (x, y))
+            position = (col * pixel_size, row * pixel_size)
+            r, g, b = base_image.getpixel(position)[:3]
+            if r == 0 and g == 0 and b == 0:
+                continue
+            base_image.paste(ims[i], position)
             i += 1
-            y += thumbnail_height
-        x += thumbnail_width
-        y = 0
-    new_im = new_im.convert("RGBA")
-    return new_im
+    base_image = base_image.convert("RGBA")
+    return base_image
+
+
+def pixelate(image, pixel_size):
+    image = image.convert("1")
+    w, h = image.size
+    array = np.uint8(np.array(image) * 255)
+    for i in range(int(h / pixel_size)):
+        for j in range(int(w / pixel_size)):
+            window = array[
+                i * pixel_size : (i + 1) * pixel_size,
+                j * pixel_size : (j + 1) * pixel_size,
+            ]
+            if window.sum() / 255 < pixel_size * pixel_size * 0.7:
+                window[:, :] = 0
+            else:
+                window[:, :] = 255
+    return Image.fromarray(array).convert("RGBA")
+
+
+def get_thumbnail_size(images, width, height):
+    n = len(images)
+    k = sqrt((width * height) / n)
+    cols = int(n / height * k) + 1
+    rows = int(n / width * k) + 1
+    thumbnail_width = width // cols
+    thumbnail_height = height // rows
+    assert thumbnail_height == thumbnail_width
+    return thumbnail_width
 
 
 if __name__ == "__main__":
     images = get_images()
     w, h = 2880, 5120
-    collage = create_collage(w, h, images)
+    pixel_size = get_thumbnail_size(images, w, h)
     text = draw_text(w, h)
-    out = Image.alpha_composite(collage, text)
+    text = pixelate(text, pixel_size)
+    collage = create_collage(text, images, pixel_size)
+    # out = Image.alpha_composite(collage, text)
+    out = text
     out.save("collage.png")
