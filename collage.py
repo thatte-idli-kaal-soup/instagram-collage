@@ -131,9 +131,9 @@ def get_thumbnail(image, size):
     return image
 
 
-def main():
+def main(order):
     w, h = 2880, 5120
-    images = get_images(CHRONO)
+    images = get_images(order)
     print(len(images))
     pixel_size = get_thumbnail_size(images, w, h)
     text = draw_text(w, h)
@@ -143,4 +143,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--order", default=CHRONO, type=int)
+
+    options = parser.parse_args()
+    main(options.order)
