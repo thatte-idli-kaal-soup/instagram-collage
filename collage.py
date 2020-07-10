@@ -74,10 +74,8 @@ def pixelate(image, pixel_size):
 
 
 def get_thumbnail_size(images, width, height):
-    n = len(images)
-    k = sqrt((width * height) / n)
-    cols = int(n / height * k) + 1
-    rows = int(n / width * k) + 1
+    cols = 9
+    rows = 16
     thumbnail_width = width // cols
     thumbnail_height = height // rows
     assert thumbnail_height == thumbnail_width
@@ -95,7 +93,6 @@ def get_thumbnail(image, size):
         else:
             delta = int((h - crop) / 2)
             upper, lower = delta, h - delta
-
         image = image.crop((left, upper, right, lower))
 
     image.thumbnail(size)
