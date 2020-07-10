@@ -2,6 +2,7 @@
 
 import glob
 import json
+import random
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -15,8 +16,12 @@ EXCLUDE_TAGS = {
 }
 INCLUDE_IMAGES = ("23101181_155043781769865_1657988909629440000_n.jpg",)
 
+CHRONO = 1
+REVERSE_CHRONO = 2
+RANDOM = 3
 
-def get_images():
+
+def get_images(order=CHRONO):
     images = glob.glob("content/*.jpg")
     with open("content/tiks_ultimate.json") as f:
         data = json.load(f)
@@ -31,6 +36,12 @@ def get_images():
         f"content/{image}" for image in image_names if image.endswith(".jpg")
     ]
     # FIXME: Get images from videos
+    if order == CHRONO:
+        ordered_images.reverse()
+    elif order == REVERSE_CHRONO:
+        pass
+    else:
+        random.shuffle(ordered_images)
     return ordered_images
 
 
@@ -112,7 +123,7 @@ def get_thumbnail(image, size):
 
 if __name__ == "__main__":
     w, h = 2880, 5120
-    images = get_images()
+    images = get_images(CHRONO)
     print(len(images))
     pixel_size = get_thumbnail_size(images, w, h)
     text = draw_text(w, h)
