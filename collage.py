@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import glob
-from math import sqrt
 import json
 
 import numpy as np
