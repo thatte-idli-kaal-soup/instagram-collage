@@ -7,6 +7,15 @@ import json
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
+EXCLUDE_TAGS = {
+    "repost",
+    "regrann",
+    "ultimatefrisbeebingo",
+    "AirborneTeam",
+    "cyclingmanalitoleh",
+}
+INCLUDE_IMAGES = ("23101181_155043781769865_1657988909629440000_n.jpg",)
+
 
 def get_images():
     images = glob.glob("content/*.jpg")
@@ -16,10 +25,14 @@ def get_images():
         url.split("?")[0].split("/")[-1]
         for image in data["GraphImages"]
         for url in image["urls"]
+        if url.split("?")[0].endswith(INCLUDE_IMAGES)
+        or not EXCLUDE_TAGS.intersection([tag.lower() for tag in image.get("tags", [])])
     ]
-    ordered_images = [f"content/{image}" for image in image_names]
+    ordered_images = [
+        f"content/{image}" for image in image_names if image.endswith(".jpg")
+    ]
     # FIXME: Get images from videos
-    return sorted(images, key=lambda x: ordered_images.index(x), reverse=True)
+    return ordered_images
 
 
 def draw_text(width, height):
