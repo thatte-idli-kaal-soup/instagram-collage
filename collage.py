@@ -20,6 +20,9 @@ CHRONO = 1
 REVERSE_CHRONO = 2
 RANDOM = 3
 
+FILL_ROWS = 1
+FILL_COLS = 2
+
 
 def get_images(order=CHRONO):
     images = glob.glob("content/*.jpg")
@@ -53,7 +56,14 @@ def draw_text(width, height):
     return txt
 
 
-def create_collage(base_image, images, pixel_size):
+def get_position(rows, cols, fill_order):
+    if fill_order == FILL_ROWS:
+        return [(row, col) for row in range(rows) for col in range(cols)]
+    else:
+        return [(row, col) for col in range(cols) for row in range(rows)]
+
+
+def create_collage(base_image, images, pixel_size, fill_order=FILL_ROWS):
     # Adapted from https://stackoverflow.com/a/35460517
     w, h = base_image.size
     cols, rows = int(w / pixel_size), int(h / pixel_size)
@@ -64,16 +74,16 @@ def create_collage(base_image, images, pixel_size):
         im = get_thumbnail(im, size)
         ims.append(im)
     i = 0
-    for col in range(cols):
-        for row in range(rows):
-            if i >= len(images):
-                break
-            position = (col * pixel_size, row * pixel_size)
-            r, g, b = base_image.getpixel(position)[:3]
-            if r == 0 and g == 0 and b == 0:
-                continue
-            base_image.paste(ims[i], position)
-            i += 1
+
+    for row, col in get_position(rows, cols, fill_order):
+        if i >= len(images):
+            break
+        position = (col * pixel_size, row * pixel_size)
+        r, g, b = base_image.getpixel(position)[:3]
+        if r == 0 and g == 0 and b == 0:
+            continue
+        base_image.paste(ims[i], position)
+        i += 1
     base_image = base_image.convert("RGBA")
     return base_image
 
