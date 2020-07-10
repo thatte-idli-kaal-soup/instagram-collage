@@ -103,12 +103,11 @@ def get_thumbnail(image, size):
 
 
 if __name__ == "__main__":
-    images = get_images()
     w, h = 2880, 5120
+    images = get_images()
+    print(len(images))
     pixel_size = get_thumbnail_size(images, w, h)
     text = draw_text(w, h)
-    text = pixelate(text, pixel_size)
-    collage = create_collage(text, images, pixel_size)
-    # out = Image.alpha_composite(collage, text)
-    out = text
-    out.save("collage.png")
+    collage = pixelate(text, pixel_size)
+    create_collage(collage, images, pixel_size)
+    collage.save("collage.png")
