@@ -34,7 +34,6 @@ def create_collage(base_image, images, pixel_size):
     # Adapted from https://stackoverflow.com/a/35460517
     w, h = base_image.size
     cols, rows = int(w / pixel_size), int(h / pixel_size)
-    print(cols, rows)
     size = (pixel_size, pixel_size)
     ims = []
     for p in images:
