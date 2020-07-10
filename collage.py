@@ -23,11 +23,8 @@ def get_images():
 
 
 def draw_text(width, height):
-    # make a blank image for the text, initialized to transparent text color
     txt = Image.new("RGBA", (width, height), (255, 255, 255, 0))
-
     fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMonoBold.ttf", 2000)
-
     d = ImageDraw.Draw(txt)
     d.text((width * 0.3, 10), "1\n0\n0", font=fnt, fill=(0, 0, 0, 255))
     return txt
