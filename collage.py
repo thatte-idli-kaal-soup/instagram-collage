@@ -29,9 +29,7 @@ def draw_text(width, height):
     fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMonoBold.ttf", 2000)
 
     d = ImageDraw.Draw(txt)
-    d.text((width / 5, 10), "1", font=fnt, fill=(0, 0, 0, 255))
-    d.text((width / 5, height / 3), "0", font=fnt, fill=(0, 0, 0, 255))
-    d.text((width / 5, 2 * height / 3), "0", font=fnt, fill=(0, 0, 0, 255))
+    d.text((width / 5, 10), "1\n0\n0", font=fnt, fill=(0, 0, 0, 255))
     return txt
 
 
